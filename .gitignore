@@ -4,7 +4,6 @@ tbwl-app/src-tauri/gen/
 
 # Node.js
 tbwl-app/node_modules/
-tbwl-app/package-lock.json
 
 # Build output
 tbwl-app/dist/
