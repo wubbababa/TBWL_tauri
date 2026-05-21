@@ -55,8 +55,8 @@ jobs:
         with:
           projectPath: tbwl-app
           tagName: ${{ github.ref_name }}
-          releaseName: 'TBWL v${{ github.ref_name }}'
+          releaseName: 'TBWL ${{ github.ref_name }}'
           releaseBody: '请从下方 Assets 下载对应系统的安装包。'
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
