@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: ''
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: install frontend dependencies
+        run: npm ci
+        working-directory: tbwl-app
+
+      - name: create frontend dist
+        run: |
+          mkdir -p tbwl-app/dist
+          @"
+          <!DOCTYPE html>
+          <html lang="zh-CN">
+          <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>TBWL</title>
+          </head>
+          <body>
+            <div id="root"></div>
+          </body>
+          </html>
+          "@ | Out-File -FilePath tbwl-app/dist/index.html -Encoding UTF8
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: tbwl-app
+          tagName: ${{ github.ref_name }}
+          releaseName: 'TBWL v${{ github.ref_name }}'
+          releaseBody: '请从下方 Assets 下载对应系统的安装包。'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
