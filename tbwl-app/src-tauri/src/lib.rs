@@ -13,8 +13,18 @@ pub fn run() {
             .title("TBWL")
             .inner_size(1280.0, 800.0)
             .resizable(true)
-            // 传入 Chromium/Edge 命令行参数，忽略证书错误
-            .additional_browser_args("--ignore-certificate-errors --ignore-ssl-errors")
+            .additional_browser_args("--ignore-certificate-errors --ignore-ssl-errors --overscroll-history-navigation=0 --disable-features=ElasticOverscroll")
+            .initialization_script(r#"
+                (function() {
+                    var style = document.createElement('style');
+                    style.textContent = 'html, body { overscroll-behavior: none !important; overflow: auto; }';
+                    (document.head || document.documentElement).appendChild(style);
+                    document.addEventListener('DOMContentLoaded', function() {
+                        document.documentElement.style.setProperty('overscroll-behavior', 'none', 'important');
+                        document.body.style.setProperty('overscroll-behavior', 'none', 'important');
+                    });
+                })();
+            "#)
             .build()?;
             Ok(())
         })
